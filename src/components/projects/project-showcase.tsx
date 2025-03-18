@@ -10,7 +10,7 @@ import { useSound } from "@/hooks/use-sound-effects";
 import {
   StaggerContainer,
   StaggerItem,
-} from "@/components/animations/page-transition";
+} from "@/components/animations/stagger-animation";
 
 // Przykładowe dane projektów
 const PROJECTS: Project[] = [

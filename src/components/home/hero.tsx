@@ -6,7 +6,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
-import type { Container, Engine } from "tsparticles-engine";
+import type { Container, Engine } from "@tsparticles/engine";
 import { TypeAnimation } from "react-type-animation";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowDown, Github, Linkedin } from "lucide-react";
@@ -169,7 +169,7 @@ export function Hero() {
       <div className="absolute inset-0 z-0">
         <Particles
           id="tsparticles"
-          init={particlesInit}
+          init={particlesInit as any}
           loaded={particlesLoaded as any}
           options={getParticlesConfig() as any}
           className="absolute inset-0"
