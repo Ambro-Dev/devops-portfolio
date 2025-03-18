@@ -1,45 +1,72 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/home/hero.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
+// Używam starsza wersję tsparticles z pakietu react-tsparticles
 import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
-import type { Container, Engine } from "@tsparticles/engine";
+import { loadSlim } from "tsparticles-slim";
+import type { Engine, Container, ISourceOptions } from "tsparticles-engine";
 import { TypeAnimation } from "react-type-animation";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowDown, Github, Linkedin } from "lucide-react";
 import Link from "next/link";
 import { useThemeStore } from "@/lib/theme";
-import { useSound } from "@/hooks/use-sound-effects";
+import useSound from "use-sound";
 
-export function Hero() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoaded, setIsLoaded] = useState(false);
-  const { mode } = useThemeStore();
-  const { playSound } = useSound();
+// Define types for theme store
+interface ThemeStore {
+  mode: "light" | "dark";
+}
 
-  // Funkcja inicjalizująca silnik cząsteczek
-  const particlesInit = async (engine: Engine) => {
-    await loadFull(engine as any);
-  };
+// Hook dla useSound musi być zgodny z typami pakietu use-sound
+type PlayFunction = ReturnType<typeof useSound>[0];
 
-  // Funkcja wywoływana po załadowaniu cząsteczek
-  const particlesLoaded = (container: Container | undefined) => {
-    if (container) {
-      setIsLoaded(true);
+export function Hero(): JSX.Element {
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  // Get theme with fallback
+  const { mode = "light" } = (useThemeStore() || {}) as ThemeStore;
+
+  // Używamy bezpośrednio use-sound zgodnie z jego API
+  const [playHoverSound] = useSound("/sounds/hover.mp3", { volume: 0.5 });
+  const [playClickSound] = useSound("/sounds/click.mp3", { volume: 0.5 });
+
+  // Set mounted state after component mounts to avoid hydration issues
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Optimize the initialization function with useCallback
+  const particlesInit = useCallback(async (engine: Engine): Promise<void> => {
+    try {
+      // Używamy wersji 2.x.x loadSlim
+      await loadSlim(engine);
+    } catch (error) {
+      console.error("Error initializing particles:", error);
     }
-  };
+  }, []);
 
-  // Konfiguracja cząsteczek w zależności od trybu
-  const getParticlesConfig = () => {
+  // Function called when particles are loaded
+  const particlesLoaded = useCallback(
+    async (container?: Container): Promise<void> => {
+      if (container) {
+        setIsLoaded(true);
+      }
+    },
+    []
+  );
+
+  // Particles configuration based on theme mode
+  const getParticlesConfig = useCallback((): ISourceOptions => {
     const isDark = mode === "dark";
 
     return {
+      fpsLimit: 120,
       particles: {
         number: {
-          value: 100,
+          value: 80,
           density: {
             enable: true,
             value_area: 800,
@@ -55,9 +82,10 @@ export function Hero() {
           value: isDark ? 0.3 : 0.2,
           random: true,
           anim: {
+            // W wersji 2.x używa "anim" zamiast "animation"
             enable: true,
             speed: 1,
-            opacity_min: 0.1,
+            opacity_min: 0.1, // W wersji 2.x używa "opacity_min" zamiast "minimumValue"
             sync: false,
           },
         },
@@ -65,13 +93,15 @@ export function Hero() {
           value: 3,
           random: true,
           anim: {
+            // W wersji 2.x używa "anim" zamiast "animation"
             enable: true,
             speed: 2,
-            size_min: 0.1,
+            size_min: 0.1, // W wersji 2.x używa "size_min" zamiast "minimumValue"
             sync: false,
           },
         },
         line_linked: {
+          // W wersji 2.x używa "line_linked" zamiast "links"
           enable: true,
           distance: 150,
           color: isDark ? "#ffffff" : "#000000",
@@ -84,8 +114,7 @@ export function Hero() {
           direction: "none",
           random: true,
           straight: false,
-          out_mode: "out",
-          bounce: false,
+          out_mode: "out", // W wersji 2.x używa "out_mode" zamiast "outModes"
           attract: {
             enable: false,
             rotateX: 600,
@@ -94,13 +123,15 @@ export function Hero() {
         },
       },
       interactivity: {
-        detect_on: "canvas",
+        detect_on: "canvas", // W wersji 2.x używa "detect_on" zamiast "detectOn"
         events: {
           onhover: {
+            // W wersji 2.x używa "onhover" zamiast "onHover"
             enable: true,
             mode: "grab",
           },
           onclick: {
+            // W wersji 2.x używa "onclick" zamiast "onClick"
             enable: true,
             mode: "push",
           },
@@ -110,19 +141,20 @@ export function Hero() {
           grab: {
             distance: 140,
             line_linked: {
+              // W wersji 2.x używa "line_linked" zamiast "links"
               opacity: 1,
             },
           },
           push: {
-            particles_nb: 4,
+            particles_nb: 4, // W wersji 2.x używa "particles_nb" zamiast "quantity"
           },
         },
       },
-      retina_detect: true,
-    };
-  };
+      retina_detect: true, // W wersji 2.x używa "retina_detect" zamiast "detectRetina"
+    } as ISourceOptions;
+  }, [mode]);
 
-  // Animacje elementów
+  // Animations
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -144,6 +176,7 @@ export function Hero() {
     },
   };
 
+  // Array for type animation sequence
   const roles = [
     "Fullstack Developer",
     1500,
@@ -155,23 +188,35 @@ export function Hero() {
     1500,
   ];
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      playSound("click");
+  // Scroll to section function with error handling
+  const scrollToSection = (id: string): void => {
+    try {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        playClickSound();
+      } else {
+        console.warn(`Element with id "${id}" not found.`);
+      }
+    } catch (error) {
+      console.error(`Error scrolling to section "${id}":`, error);
     }
   };
+
+  // If not mounted yet, return nothing or a loading state to avoid hydration issues
+  if (!isMounted) {
+    return <div className="min-h-screen" />;
+  }
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
       {/* Particle Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 -z-10">
         <Particles
           id="tsparticles"
-          init={particlesInit as any}
-          loaded={particlesLoaded as any}
-          options={getParticlesConfig() as any}
+          init={particlesInit}
+          loaded={particlesLoaded}
+          options={getParticlesConfig()}
           className="absolute inset-0"
         />
       </div>
@@ -184,7 +229,7 @@ export function Hero() {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          animate={isLoaded ? "visible" : "hidden"}
           className="grid gap-6 md:gap-10 lg:grid-cols-2 items-center"
         >
           <div className="flex flex-col gap-6">
@@ -235,7 +280,8 @@ export function Hero() {
                 size="lg"
                 className="group"
                 onClick={() => scrollToSection("projects")}
-                onMouseEnter={() => playSound("hover")}
+                onMouseEnter={() => playHoverSound()}
+                type="button"
               >
                 Zobacz moje projekty
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -244,7 +290,8 @@ export function Hero() {
                 variant="outline"
                 size="lg"
                 onClick={() => scrollToSection("contact")}
-                onMouseEnter={() => playSound("hover")}
+                onMouseEnter={() => playHoverSound()}
+                type="button"
               >
                 Kontakt
               </Button>
@@ -254,8 +301,9 @@ export function Hero() {
               <Link
                 href="https://github.com/"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground/80 hover:text-foreground transition-colors"
-                onMouseEnter={() => playSound("hover")}
+                onMouseEnter={() => playHoverSound()}
               >
                 <Github size={20} />
                 <span className="sr-only">GitHub</span>
@@ -263,8 +311,9 @@ export function Hero() {
               <Link
                 href="https://linkedin.com/"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground/80 hover:text-foreground transition-colors"
-                onMouseEnter={() => playSound("hover")}
+                onMouseEnter={() => playHoverSound()}
               >
                 <Linkedin size={20} />
                 <span className="sr-only">LinkedIn</span>

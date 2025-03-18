@@ -10,7 +10,7 @@ import {
   StaggerItem,
 } from "@/components/animations/stagger-animation";
 
-export function HomePage() {
+export default function Page() {
   return (
     <>
       {/* Hero Section */}
@@ -73,15 +73,4 @@ export function HomePage() {
       <EasterEggTerminal />
     </>
   );
-}
-
-// src/app/(landing)/layout.tsx
-import { PageTransition } from "@/components/animations/page-transition";
-
-export default function LandingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <PageTransition>{children}</PageTransition>;
 }
