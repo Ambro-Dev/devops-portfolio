@@ -1,27 +1,190 @@
+/* src/app/globals.css */
+@import '../styles/theme-variables.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+  
+  code, pre {
+    @apply font-mono;
+  }
+  
+  /* Selection color */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+  
+  /* Smooth scrolling for anchor links */
+  html {
+    scroll-padding-top: 5rem;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom components */
+@layer components {
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end bg-clip-text text-transparent;
+  }
+  
+  /* Gradient border */
+  .gradient-border {
+    position: relative;
+    border-radius: theme('borderRadius.lg');
+    overflow: hidden;
+  }
+  
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(
+      to right,
+      hsl(var(--gradient-start)),
+      hsl(var(--gradient-mid)),
+      hsl(var(--gradient-end))
+    );
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  
+  /* Animated gradient border */
+  .animated-gradient-border::before {
+    background-size: 200% 200%;
+    animation: gradient-rotate 3s ease infinite;
+  }
+  
+  /* Glass morphism */
+  .glass {
+    @apply bg-background/70 backdrop-blur-md border border-border/50;
+  }
+  
+  /* Glow effect */
+  .glow {
+    box-shadow: 0 0 10px var(--glow-color);
+  }
+  
+  /* 3D Card Hover Effect */
+  .card-3d {
+    transform-style: preserve-3d;
+    transition: transform 300ms ease;
+  }
+  
+  .card-3d-content {
+    transform: translateZ(20px);
+  }
+  
+  /* Code highlight styles */
+  .code-highlight {
+    @apply bg-muted rounded-md p-4 font-mono text-sm overflow-x-auto;
+  }
+  
+  .code-line {
+    @apply block px-4 -mx-4 border-l-4 border-transparent;
+  }
+  
+  .code-line.highlighted {
+    @apply bg-muted/50 border-primary;
+  }
 }
 
+/* Animations */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  /* Parallax mouse movement */
+  .parallax-mouse {
+    transform-style: preserve-3d;
+    transform: perspective(1000px);
+  }
+  
+  .parallax-mouse-child {
+    transform: translateZ(20px);
+  }
+  
+  /* Typing cursor animation */
+  .typing-cursor {
+    @apply inline-block w-[2px] h-5 bg-primary align-middle ml-1 animate-terminal-blink;
+  }
+  
+  /* Stagger animations for lists and grids */
+  .stagger-item {
+    @apply opacity-0;
+    animation: fadeInUp 0.6s ease forwards;
+  }
+  
+  /* Image hover zoom effect */
+  .img-zoom-effect {
+    @apply overflow-hidden;
+  }
+  
+  .img-zoom-effect img {
+    @apply transition-transform duration-500 ease-in-out;
+  }
+  
+  .img-zoom-effect:hover img {
+    @apply scale-110;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatingAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
