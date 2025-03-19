@@ -19,9 +19,6 @@ interface ThemeStore {
   mode: "light" | "dark";
 }
 
-// Hook dla useSound musi być zgodny z typami pakietu use-sound
-type PlayFunction = ReturnType<typeof useSound>[0];
-
 export function Hero(): JSX.Element {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState<boolean>(false);
